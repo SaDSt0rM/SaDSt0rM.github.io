@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Patient Case File 💗</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #fde2e4, #fadadd);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    overflow: hidden;
+}
+
+.card {
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    animation: fadeIn 0.5s ease;
+    position: relative;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+h1 { margin-top: 0; font-size: 1.6rem; }
+h3 { margin-top: 20px; }
+
+.tag {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #ffe3ea;
+    color: #c9184a;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin-bottom: 15px;
+}
+
+.label {
+    font-size: 0.75rem;
+    color: #888;
+    letter-spacing: 1px;
+    margin-top: 18px;
+}
+
+p, li { font-size: 0.95rem; line-height: 1.5; }
+
+ul { padding-left: 18px; }
+
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: #e63946;
+    color: #fff;
+    font-size: 1rem;
+    margin-top: 22px;
+    cursor: pointer;
+}
+
+.btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.yes { background: #ff4d6d; }
+.no  { background: #ced4da; color: #333; position: relative; }
+
+/* Teddy animation */
+.teddy {
+    font-size: 3rem;
+    animation: jump 1s infinite;
+}
+@keyframes jump {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* Signature pad */
+.signature-box {
+    margin-top: 12px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    height: 120px;
+    position: relative;
+}
+
+.signature-box canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Party popper */
+.confetti {
+    position: fixed;
+    width: 8px;
+    height: 12px;
+    top: 50%;
+    left: 50%;
+    animation: pop 1.8s ease-out forwards;
+}
+
+@keyframes pop {
+    0% { transform: translate(0,0); opacity: 1; }
+    100% {
+        transform: translate(var(--x), var(--y)) rotate(720deg);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="app"></div>
+
+<script>
+let step = 0;
+const app = document.getElementById("app");
+
+function render() {
+
+if (step === 0) {
+app.innerHTML = `
+<h1>Patient Case File</h1>
+<span class="tag">Confidential</span>
+
+<div class="label">PATIENT NAME</div>
+<p>Prashant Bhattarai</p>
+
+<div class="label">PATIENT PARTY</div>
+<p>Bhattarai Family 😝</p>
+
+<div class="label">ATTENDING MEDICAL PROFESSIONAL</div>
+<p>Dr. Ashima 🩺💗</p>
+
+<button onclick="next()">Open Case</button>
+`;
+}
+
+if (step === 1) {
+app.innerHTML = `
+<h1>Symptoms</h1>
+<span class="tag">Well Documented</span>
+
+<ul>
+<li>Spontaneous smiling triggered by dopamine surges</li>
+<li>Heart palpitations when in her presence</li>
+<li>Reduced cortisol levels when hearing her voice</li>
+<li>Persistent preoccupation with her activates the prefrontal cortex</li>
+</ul>
+
+<button onclick="next()">Assessment</button>
+`;
+}
+
+if (step === 2) {
+app.innerHTML = `
+<h1>Assessment</h1>
+<span class="tag">Stable</span>
+
+<p>
+Condition appears chronic and irreversible.<br><br>
+Patient feels safe, supported, and genuinely happy
+in cutuuuuuu's presence.
+</p>
+
+<button onclick="next()">Final Recommendation</button>
+`;
+}
+
+if (step === 3) {
+app.innerHTML = `
+<h1>Final Recommendation</h1>
+<span class="tag">Pending Approval</span>
+
+<p>
+This case requires final authorization
+from the attending medical professional.
+</p>
+
+<div class="teddy">🧸🌹</div>
+<h3>Dr. Ashima, will you approve this Valentine proposal case?</h3>
+
+<div class="label">APPROVAL SIGNATURE</div>
+<div class="signature-box">
+<canvas id="signature"></canvas>
+</div>
+<p><strong>Dr. Ashima</strong></p>
+
+<div class="btn-row">
+<button class="yes" onclick="yes()">APPROVE 💕</button>
+<button class="no" id="noBtn" onclick="noClick()">REJECT</button>
+</div>
+`;
+
+setupSignaturePad();
+
+const noBtn = document.getElementById("noBtn");
+document.addEventListener("mousemove", (e) => {
+const rect = noBtn.getBoundingClientRect();
+const d = Math.hypot(
+e.clientX - (rect.left + rect.width/2),
+e.clientY - (rect.top + rect.height/2)
+);
+if (d < 140) {
+noBtn.style.transform =
+`translate(${Math.random()*600-300}px, ${Math.random()*400-200}px)`;
+}
+});
+}
+}
+
+function setupSignaturePad() {
+const canvas = document.getElementById("signature");
+const ctx = canvas.getContext("2d");
+
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+ctx.strokeStyle = "#000";
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
+
+let drawing = false;
+
+canvas.onmousedown = () => drawing = true;
+canvas.onmouseup = () => drawing = false;
+canvas.onmouseleave = () => drawing = false;
+
+canvas.onmousemove = (e) => {
+if (!drawing) return;
+const rect = canvas.getBoundingClientRect();
+ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+};
+}
+
+function noClick() {
+app.innerHTML = `
+<h1>😢 Case Rejected</h1>
+<span class="tag">Emotional Damage</span>
+
+<p>
+Approval denied…<br>
+Patient experiencing acute heartbreak 💔
+</p>
+
+<div class="teddy">🧸😭</div>
+
+<button onclick="step=3; render()">Reconsider Case</button>
+`;
+}
+
+function yes() {
+const colors = ["#ff4d6d","#ffd166","#06d6a0","#4cc9f0","#f72585"];
+
+for (let i = 0; i < 120; i++) {
+const c = document.createElement("div");
+c.className = "confetti";
+c.style.background = colors[Math.floor(Math.random()*colors.length)];
+const angle = Math.random() * 2 * Math.PI;
+const radius = Math.random() * 400 + 100;
+c.style.setProperty("--x", `${Math.cos(angle)*radius}px`);
+c.style.setProperty("--y", `${Math.sin(angle)*radius + 200}px`);
+document.body.appendChild(c);
+setTimeout(() => c.remove(), 2000);
+}
+
+app.innerHTML = `
+<h1>💘 Approval Granted</h1>
+<span class="tag">Officially Authorized</span>
+
+<p>
+Case approved, signed, and sealed ❤️
+</p>
+
+<div style="font-size:3rem;">🧸💋🧸</div>
+
+<h3>Happy Valentine’s Day, Dr. Ashima 🌹</h3>
+<p>Signed with love — forever 😘</p>
+`;
+}
+
+function next() { step++; render(); }
+render();
+</script>
+
+</body>
+</html>
